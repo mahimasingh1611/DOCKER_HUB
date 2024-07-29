@@ -42,7 +42,9 @@ if any chnages reflected in host then the container will also show the change bc
 
 # Volumes:
 docker run -v /app/data ----> anonymous volume
+
 docker run -v data:/app/data ----> named volume
+
 docker run -v /path/to/code:/app/code ----> bind mounts
 
 # Anonymous volumes: 
