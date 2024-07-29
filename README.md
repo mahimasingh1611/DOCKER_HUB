@@ -67,5 +67,29 @@ survives container shutdown/restart-removal on host fs
 can be shared across containers
 can be re-used for same container(across restarts)
 
+# VOLUME COMMANDS
+---> docker volume create feedback-files
+to create the volume
+
+----> docker volume ls
+to check the list of volume
+
+---> docker volume inspect feedback
+to inspect the volume
+
+ --->to delete all multiple unused volume
+docker volume prune
+ 
+# ENV and ARGS
+
+DEFAULT_PORT = 80
+
+ENV PORT $DEFAULT_PORT
+
+EXPOSE $PORT
+
+
+
+
 
 
