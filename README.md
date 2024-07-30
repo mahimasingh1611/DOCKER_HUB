@@ -88,6 +88,121 @@ ENV PORT $DEFAULT_PORT
 
 EXPOSE $PORT
 
+# DOCKER-COMPOSE
+
+When we make multiple containers for our purpose. We need to manage all the container by our own. We need to build, run and delete which is a lot of work for multiple containers.
+
+We can use docker compose for make our work easy to build, delete and run the command in one single step. Docker compose manages multiple container easily. It can creates multiple containers in one go and tear everything down in one go too.
+
+Docker compose is not suited for managing multiple containers on different host.
+
+version: the version key specifies the version of the docker compose file format being used. Each version supports different features and syntax, so it's important to use correct version that aligns with your docker setup and desired functionality
+
+
+# syntax----
+
+version:"3.8"
+services:
+	mongodb:
+	    image:"mongo"
+	    volumes:
+		-data:/data/db
+	    container_name : mongodb
+	    environment:
+		MONGO_INITDB_ROOT_USERNAME: max
+		MONGO_INITDB_ROOT_PASSWORD: secret
+	    	-MONGO_INITDB_ROOT_USERNAME: max(we can also write like this)
+	    env_file:
+		- ./env/mongo.env
+
+
+
+We don't need to add the network as all the container will be created in the same network if they are in docker compose file
+
+How do we start services with docker compose?
+
+# docker-compose up(to start all the services)
+# docker-compose down(to delete all the services) -- it will not delete volume
+# docker-compose down -v (it will delete the volume)
+
+backend:
+  build: ./backend
+  build:
+    context: ./backend
+    Dockerfile: dockerfile-dev(name of the docker file)
+  args:
+    some-arg:1
+  ports:
+    - '80:80'
+  volumes:
+    - logs: /app/logs
+    - ./backend:/app
+    - /app/node_modules
+  env_files:
+    - ./env/backend.env
+
+  depends_on:
+	-mongodb
+
+
+frontend:
+  build: ./frontend
+  ports:
+    - '3000:3000'
+  volumes:
+    - ./frontend/src:/app/src
+  stdin_open: true
+  tty: true
+
+  depends_on:
+    - backend
+
+volume:
+	data(named volume)
+	logs
+ 
+# Networks
+
+Networks:
+
+How we connect multiple container to each other and how you let them talk to each other. How you could connect an application running in a container to your local host machine.
+
+Case 1. if the container running application wants to communicate with the outside container or wants to talk to API 
+
+Case 2: if we want to communicate host machine database(service running on our host mahine)
+
+Case 3: container to container communication
+
+Solution case1: if we wanna communicate the container to outside API, in node js we are using axios to get the API. By using the postman app We can send the request and receive the data.
+Same way we are using locally we can communicate outside the container with no special setup.
+
+But if wanna communicate database that is present in our host machine we can not connect it.
+
+Solution case 2:
+We need to add some code that is understood by docker only
+'mongodb://host.docker.internal:27017/favourite'
+
+host.docker.internal this will be understood by docker and translate this as an IP address of a host machine and  connect to our machine. We can use any service by using this code. For example we are using mongodb in this but we can also use http request and connect to our web appilication that is running in our local machine.
+
+
+Solution case 3:
+If we wanna communicate to container to container then we can use IP address of container and we can put 
+mongodb://IP ADDRESS:27017/favourite. the container will communicate to the brand new mongo db not the mongodb that s present on your host machine.
+
+Network commands:
+# docker network create favourites-net (create network)
+# docker network ls (list of all network)
+# docker run -d --name mangodb --network favourites-net mongo
+If the containers are in the same network they can talk to each other easily. We do not need to expose the post as port are only be used when we need to connect something outside the container or from our local host
+
+How can containers communicate with each other if they are in the same network?
+We can use the container name as addresses
+
+
+
+
+
+
 
 
 
